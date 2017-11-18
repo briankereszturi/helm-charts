@@ -1,0 +1,55 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.internalPort }}
+          env:
+            - name: BOOTSTRAP_SERVERS
+            {{ if .Values.bootstrapServers }}
+              value: {{ .Values.bootstrapServers }}
+            {{ else }}
+              value: "{{ .Release.Name }}-kafka:9092"
+            {{ end }}
+            - name: CONFIG_STORAGE_TOPIC
+              value: {{ .Values.configStorageTopic }}
+            - name: OFFSET_STORAGE_TOPIC
+              value: {{ .Values.offsetStorageTopic }}
+            - name: CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE
+              value: {{ .Values.enableValueSchemas | quote }}
+            - name: CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE
+              value: {{ .Values.enableKeySchemas | quote }}
+          livenessProbe:
+            initialDelaySeconds: 30
+            failureThreshold: 10
+            httpGet:
+              path: /
+              port: {{ .Values.service.internalPort }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.internalPort }}
+            failureThreshold: 3
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}

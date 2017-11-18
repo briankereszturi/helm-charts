@@ -1,0 +1,12 @@
+apiVersion: v1
+entries:
+  debezium:
+  - apiVersion: v1
+    created: 2017-11-18T14:46:51.818336427+08:00
+    description: A Helm chart for Kubernetes
+    digest: f3af175ebc212dc4462be92240cda0461b57f02dd61af7d5bb269611771ef7c9
+    name: debezium
+    urls:
+    - https://briankereszturi.github.com/helm-charts/debezium-0.1.0.tgz
+    version: 0.1.0
+generated: 2017-11-18T14:46:51.817917879+08:00

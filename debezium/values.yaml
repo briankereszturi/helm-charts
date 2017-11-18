@@ -1,0 +1,17 @@
+replicaCount: 1
+image:
+  repository: debezium/connect
+  tag: "0.7"
+  pullPolicy: IfNotPresent
+service:
+  name: debezium
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8083
+
+  # Set to override the default of .Release.Name-kafka:9092.
+#bootstrapServers:
+configStorageTopic: _connect_configs
+offsetStorageTopic: _connect_offsets
+enableValueSchemas: true
+enableKeySchemas: true
